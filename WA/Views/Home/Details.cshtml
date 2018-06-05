@@ -1,0 +1,40 @@
+﻿@using DB.Models;
+
+@model Table3;
+
+<h2>Details</h2>
+
+@if (Model == null)
+{
+<div class="contentText">No volums at all.</div>
+}
+else
+{
+<h1>@Model.Id</h1>
+<p>
+    @if (Model.FileData == null)
+    {
+    <span>NO DATA FILE!</span>
+    }
+    else
+    {
+    <span>HAVE DATA FILE</span>
+    }
+</p>
+
+@foreach (Table2 table2s in Model.Table2s)
+{
+    <p>
+        Table2 Id [@table2s.Id]:
+    </p>
+    <ul>
+        @foreach (Table1 table1 in table2s.Table1s)
+        {
+        <li>
+            <span>Table1 Id: @table1.Id</span><br />
+            <span>User name: @table1.User.Name [@table1.UserId]</span>
+        </li>
+        }
+    </ul>
+    }
+}
