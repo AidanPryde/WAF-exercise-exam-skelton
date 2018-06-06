@@ -107,5 +107,29 @@ namespace WA.Services
                 return null;
             }
         }
+
+        public Boolean SaveFileData(Int32 table3Id, Byte[] fileData)
+        {
+            try
+            {
+                Table3 table3 = GetTable3ByTable3Id(table3Id);
+
+                if (table3 == null)
+                {
+                    return false;
+                }
+
+                table3.FileData = fileData;
+                _context.SaveChanges();
+
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
+        }
     }
 }

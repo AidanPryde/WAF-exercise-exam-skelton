@@ -1,8 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -80,6 +83,42 @@ namespace WA.Controllers
             return View("Details", table3);
         }
 
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public IActionResult UploadFile(Int32? table3Id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return Content("file not selected");
+            }
+
+            Byte[] fileData = null;
+            using (var fileStream = file.OpenReadStream())
+            using (var memoryStream =  new MemoryStream())
+            {
+                fileStream.CopyTo(memoryStream);
+                fileData = memoryStream.ToArray();
+            }
+            
+            if(_myService.SaveFileData(table3Id ?? -1, fileData) == false)
+            {
+                ViewBag.Error = "Failed to upload File.";
+            }
+
+            return RedirectToAction("Details", table3Id ?? -1);
+        }
+
+        public IActionResult Download(Int32? table3Id)
+        {
+            if (table3Id == null)
+            {
+                return Content("table3Id not present");
+            }
+
+            return File(_myService.GetTable3FileData(table3Id ?? -1), "application/pdf", "pdf_file");
+        }
+
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
@@ -114,6 +153,31 @@ namespace WA.Controllers
             pagingTab.Add(new Int32[] { from, to });
 
             return pagingTab;
+        }
+
+        private string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types[ext];
+        }
+
+        private Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+            {
+                {".txt", "text/plain"},
+                {".pdf", "application/pdf"},
+                {".doc", "application/vnd.ms-word"},
+                {".docx", "application/vnd.ms-word"},
+                {".xls", "application/vnd.ms-excel"},
+                {".xlsx", "application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet"},
+                {".png", "image/png"},
+                {".jpg", "image/jpeg"},
+                {".jpeg", "image/jpeg"},
+                {".gif", "image/gif"},
+                {".csv", "text/csv"}
+            };
         }
     }
 }

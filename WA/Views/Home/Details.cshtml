@@ -11,19 +11,32 @@
 else
 {
 <h1>@Model.Id</h1>
-<p>
+<div>
+    @if (ViewBag.Error != null)
+    {
+        <div>
+            @ViewBag.Error
+        </div>
+    }
     @if (Model.FileData == null)
     {
-    <span>NO DATA FILE!</span>
+        <div class="">
+            <form asp-controller="Home" asp-action="UploadFile" method="post"
+                  enctype="multipart/form-data">
+                <input type="number" hidden name="table3Id" value="@Model.Id" />
+                <input type="file" name="file" />
+                <button type="submit">Upload File</button>
+            </form>
+        </div>
     }
     else
     {
-    <span>HAVE DATA FILE</span>
+        <a asp-action="Download" asp-route-table3Id="@Model.Id">@Model.Id</a>
     }
-</p>
+</div>
 
-@foreach (Table2 table2s in Model.Table2s)
-{
+    @foreach (Table2 table2s in Model.Table2s)
+    {
     <p>
         Table2 Id [@table2s.Id]:
     </p>

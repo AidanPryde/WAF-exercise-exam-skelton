@@ -25,5 +25,7 @@ namespace WA.Services
 
         Table3 GetTable3ByTable3Id(Int32 table3Id);
         Byte[] GetTable3FileData(Int32 table3Id);
+
+        Boolean SaveFileData(Int32 table3Id, Byte[] fileData);
     }
 }
